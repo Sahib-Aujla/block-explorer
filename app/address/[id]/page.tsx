@@ -2,15 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Alchemy, Network } from "alchemy-sdk";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { AssetTransfersCategory } from "alchemy-sdk";
-
-const alchemy = new Alchemy({
-  apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
-  network: Network.ETH_SEPOLIA,
-});
+import alchemy from "@/lib/alchemy";
 
 export default function AddressPage() {
   const { id } = useParams();
@@ -21,7 +16,7 @@ export default function AddressPage() {
   const [txs, setTxs] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [ethPrice, setEthPrice] = useState<number>(3870.79);
   useEffect(() => {
     const fetchAddressData = async () => {
       try {
@@ -36,6 +31,11 @@ export default function AddressPage() {
           maxCount: 25, // ✅ must be a bigint
           withMetadata: true, // ✅ optional but useful for timestamps
         });
+        const res = await fetch(
+          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+        );
+        const data = await res.json();
+        setEthPrice(data.ethereum.usd);
 
         setBalance((parseFloat(bal.toString()) / 1e18).toFixed(8));
         setTxs(history.transfers);
@@ -102,7 +102,7 @@ export default function AddressPage() {
             <p className="text-zinc-400">Estimated USD Value</p>
             <p className="text-green-200 text-lg font-mono">
               ≈ $
-              {(parseFloat(balance || "0") * 3870.79).toLocaleString(
+              {(parseFloat(balance || "0") * ethPrice).toLocaleString(
                 undefined,
                 { maximumFractionDigits: 2 }
               )}
@@ -148,8 +148,13 @@ export default function AddressPage() {
                   <td className="py-2 px-4">
                     {tx.metadata?.blockTimestamp?.split("T")[0]}
                   </td>
-                  <td className="py-2 px-4 break-all">{tx.from}</td>
-                  <td className="py-2 px-4 break-all">{tx.to}</td>
+                  <Link href={`/address/${tx.from}`} className="underline">
+                    <td className="py-2 px-4 break-all">{tx.from}</td>
+                  </Link>
+
+                  <Link href={`/address/${tx.to}`} className="underline">
+                    <td className="py-2 px-4 break-all">{tx.to}</td>
+                  </Link>
                   <td className="py-2 px-4">
                     {tx.value ? (parseFloat(tx.value) / 1e18).toFixed(5) : "0"}{" "}
                     ETH
