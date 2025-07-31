@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import alchemy from '@/lib/alchemy';
+import SearchBar from '@/components/searchBar';
 
 export default function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -15,7 +16,7 @@ export default function HomePage() {
       try {
         const latest = await alchemy.core.getBlockNumber();
         const blockData = await Promise.all(
-          Array.from({ length: 10 }, (_, i) =>
+          Array.from({ length: 12 }, (_, i) =>
             alchemy.core.getBlock(latest - i)
           )
         );
@@ -54,6 +55,7 @@ export default function HomePage() {
       >
         Ethereum Blockchain Explorer
       </motion.h1>
+      <SearchBar />
 
       <motion.div
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
