@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import alchemy from '@/lib/alchemy';
-import SearchBar from '@/components/searchBar';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import alchemy from "@/lib/alchemy";
+import SearchBar from "@/components/searchBar";
 
 export default function HomePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -21,10 +21,10 @@ export default function HomePage() {
           )
         );
         setBlocks(blockData);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (err: any) {
-        console.error('Failed to fetch blockchain data:', err);
-        setError('Failed to fetch blockchain data. Check API key or network.');
+        console.error("Failed to fetch blockchain data:", err);
+        setError("Failed to fetch blockchain data. Check API key or network.");
       }
     };
 
@@ -55,6 +55,14 @@ export default function HomePage() {
       >
         Ethereum Blockchain Explorer
       </motion.h1>
+      <motion.p
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-lg font-display font-bold text-green-400 mb-10"
+      >
+        Made By Sahib
+      </motion.p>
       <SearchBar />
 
       <motion.div
@@ -77,21 +85,24 @@ export default function HomePage() {
               hidden: { opacity: 0, y: 20 },
               show: { opacity: 1, y: 0 },
             }}
-            className="rounded-xl border border-zinc-800 bg-zinc-900/80 backdrop-blur-sm p-5 transition hover:scale-[1.02] hover:shadow-lg hover:border-green-400 cursor-pointer"
           >
             <Link href={`/block/${block.number}`}>
-              <div className="space-y-2">
-                <h2 className="text-xl font-semibold text-green-300">
-                  Block #{block.number}
-                </h2>
-                <p className="text-sm text-zinc-400">
-                  {block.transactions.length} Transactions
-                </p>
-                <p className="text-sm text-zinc-500">
-                  Gas Used:{' '}
-                  {parseInt(block.gasUsed.toString()).toLocaleString()}
-                </p>
-              </div>
+              <motion.div whileHover={{ scale: 1.02 }}>
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 backdrop-blur-sm p-5 shadow transition-all duration-300 hover:shadow-lg hover:border-green-400 cursor-pointer">
+                  <div className="space-y-2">
+                    <h2 className="text-xl  font-semibold text-green-300">
+                      Block #{block.number}
+                    </h2>
+                    <p className="text-sm text-zinc-400 ">
+                      {block.transactions.length} Transactions
+                    </p>
+                    <p className="text-sm text-zinc-500">
+                      Gas Used:{" "}
+                      {parseInt(block.gasUsed.toString()).toLocaleString()}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
             </Link>
           </motion.div>
         ))}
