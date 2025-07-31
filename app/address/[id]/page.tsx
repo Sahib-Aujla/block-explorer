@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { AssetTransfersCategory } from "alchemy-sdk";
+import { AssetTransfersCategory,SortingOrder } from "alchemy-sdk";
 import alchemy from "@/lib/alchemy";
 import { ArrowBigLeft } from "lucide-react";
 import SearchBar from "@/components/searchBar";
@@ -19,28 +19,85 @@ export default function AddressPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [ethPrice, setEthPrice] = useState<number>(3870.79);
+  //   useEffect(() => {
+  //     const fetchAddressData = async () => {
+  //       try {
+  //         const bal = await alchemy.core.getBalance(id as string);
+  //         const history = await alchemy.core.getAssetTransfers({
+  //           fromBlock: "0x0",
+  //           toAddress: id as string,
+  //           category: [
+  //             AssetTransfersCategory.EXTERNAL,
+  //             AssetTransfersCategory.ERC20,
+  //           ],
+  //           maxCount: 25, // ✅ must be a bigint
+  //           withMetadata: true, // ✅ optional but useful for timestamps
+  //         });
+  //         const res = await fetch(
+  //           "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+  //         );
+  //         const data = await res.json();
+  //         setEthPrice(data.ethereum.usd);
+
+  //         setBalance((parseFloat(bal.toString()) / 1e18).toFixed(8));
+  //         setTxs(history.transfers);
+  //       } catch (err) {
+  //         console.error(err);
+  //         setError("Failed to load address data. Please verify address.");
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     };
+
+  //     fetchAddressData();
+  //   }, [id]);
   useEffect(() => {
     const fetchAddressData = async () => {
       try {
         const bal = await alchemy.core.getBalance(id as string);
-        const history = await alchemy.core.getAssetTransfers({
-          fromBlock: "0x0",
-          toAddress: id as string,
-          category: [
-            AssetTransfersCategory.EXTERNAL,
-            AssetTransfersCategory.ERC20,
-          ],
-          maxCount: 25, // ✅ must be a bigint
-          withMetadata: true, // ✅ optional but useful for timestamps
-        });
-        const res = await fetch(
-          "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+
+        const [sent, received, ethRes] = await Promise.all([
+          alchemy.core.getAssetTransfers({
+            fromBlock: "0x0",
+            fromAddress: id as string,
+            category: [
+              AssetTransfersCategory.EXTERNAL,
+              AssetTransfersCategory.ERC20,
+              AssetTransfersCategory.INTERNAL,
+            ],
+            maxCount: 50,
+            withMetadata: true,
+            order: SortingOrder.DESCENDING,
+          }),
+          alchemy.core.getAssetTransfers({
+            fromBlock: "0x0",
+            toAddress: id as string,
+            category: [
+              AssetTransfersCategory.EXTERNAL,
+              AssetTransfersCategory.ERC20,
+              AssetTransfersCategory.INTERNAL,
+            ],
+            maxCount: 50,
+            withMetadata: true,
+            order: SortingOrder.DESCENDING,
+          }),
+          fetch(
+            "https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd"
+          ),
+        ]);
+
+        const ethData = await ethRes.json();
+        setEthPrice(ethData.ethereum.usd);
+
+        // Combine and sort by block timestamp (desc)
+        const allTxs = [...sent.transfers, ...received.transfers].sort(
+          (a, b) =>
+            new Date(b.metadata?.blockTimestamp).getTime() -
+            new Date(a.metadata?.blockTimestamp).getTime()
         );
-        const data = await res.json();
-        setEthPrice(data.ethereum.usd);
 
         setBalance((parseFloat(bal.toString()) / 1e18).toFixed(8));
-        setTxs(history.transfers);
+        setTxs(allTxs.slice(0, 25)); // show latest 25
       } catch (err) {
         console.error(err);
         setError("Failed to load address data. Please verify address.");
@@ -155,12 +212,26 @@ export default function AddressPage() {
                   <td className="py-2 px-4">
                     {tx.metadata?.blockTimestamp?.split("T")[0]}
                   </td>
-                  <td onClick={()=>{router.push(`/address/${tx.from}`)}} className="py-2 px-4 break-all underline cursor-ponter">{tx.from}</td>
+                  <td
+                    onClick={() => {
+                      router.push(`/address/${tx.from}`);
+                    }}
+                    className="py-2 px-4 break-all underline cursor-ponter"
+                  >
+                    {tx.from}
+                  </td>
 
-                  <td  onClick={()=>{router.push(`/address/${tx.to}`)}} className="py-2 px-4 break-all underline cursor-pointer">{tx.to}</td>
+                  <td
+                    onClick={() => {
+                      router.push(`/address/${tx.to}`);
+                    }}
+                    className="py-2 px-4 break-all underline cursor-pointer"
+                  >
+                    {tx.to}
+                  </td>
 
                   <td className="py-2 px-4">
-                    {tx.value ? (parseFloat(tx.value) / 1e18).toFixed(5) : "0"}{" "}
+                    {tx.value}{" "}
                     ETH
                   </td>
                 </tr>
