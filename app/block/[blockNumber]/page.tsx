@@ -89,7 +89,7 @@ export default function BlockPage() {
       >
         <button
           onClick={() => router.back()}
-          className="text-green-400 cursor-pointer hover:text-green-300 text-2xl font-bold"
+          className="text-green-400 cursor-pointer hover:text-green-200 text-2xl font-bold"
           title="Go back"
         >
           <ArrowBigLeft />
