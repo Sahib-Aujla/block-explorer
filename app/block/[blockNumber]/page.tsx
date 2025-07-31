@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { Alchemy, Network } from 'alchemy-sdk';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { ArrowBigLeft } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Alchemy, Network } from "alchemy-sdk";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { ArrowBigLeft } from "lucide-react";
+import SearchBar from "@/components/searchBar";
 
 const settings = {
   apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY,
@@ -30,7 +31,7 @@ export default function BlockPage() {
       try {
         const num = parseInt(blockNumber as string);
         if (isNaN(num)) {
-          setError('Invalid block number.');
+          setError("Invalid block number.");
           return;
         }
 
@@ -38,7 +39,9 @@ export default function BlockPage() {
         setBlock(blockData);
       } catch (err) {
         console.log(err);
-        setError('Failed to fetch block. Please check the number or try again.');
+        setError(
+          "Failed to fetch block. Please check the number or try again."
+        );
       } finally {
         setLoading(false);
       }
@@ -50,7 +53,9 @@ export default function BlockPage() {
   if (error) {
     return (
       <main className="min-h-screen bg-zinc-900 text-white px-6 py-12">
-        <h1 className="text-4xl font-bold mb-8 text-red-400">Block Lookup Error</h1>
+        <h1 className="text-4xl font-bold mb-8 text-red-400">
+          Block Lookup Error
+        </h1>
         <p className="text-red-300">{error}</p>
       </main>
     );
@@ -59,6 +64,7 @@ export default function BlockPage() {
   if (loading || !block) {
     return (
       <main className="min-h-screen bg-zinc-900 text-white px-6 py-12">
+        <SearchBar />
         <motion.h1
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -74,6 +80,7 @@ export default function BlockPage() {
 
   return (
     <main className="min-h-screen bg-zinc-900 text-white px-6 py-10">
+      <SearchBar />
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -150,7 +157,7 @@ export default function BlockPage() {
         className="space-y-4"
       >
         <h2 className="text-xl font-semibold text-green-300">Transactions</h2>
-         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
         {block.transactions.slice(0, 10).map((tx: any) => (
           <div
             key={tx.hash}
