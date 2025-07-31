@@ -53,16 +53,13 @@ export default function HomePage() {
         transition={{ duration: 0.6 }}
         className="text-4xl font-display font-bold text-green-400 mb-10"
       >
-        Ethereum Blockchain Explorer
+        Ethereum Blockchain Explorer{" "}
+        <span className="text-lg italic font-display font-semibold text-green-400 mb-10 p-2">
+          {" "}
+          Made By Sahib
+        </span>
       </motion.h1>
-      <motion.p
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-lg font-display font-bold text-green-400 mb-10"
-      >
-        Made By Sahib
-      </motion.p>
+
       <SearchBar />
 
       <motion.div
