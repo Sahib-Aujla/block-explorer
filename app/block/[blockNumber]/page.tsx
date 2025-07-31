@@ -156,21 +156,57 @@ export default function BlockPage() {
         transition={{ delay: 0.3 }}
         className="space-y-4"
       >
-        <h2 className="text-xl font-semibold text-green-300">Transactions</h2>
-        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-        {block.transactions.slice(0, 10).map((tx: any) => (
-          <div
-            key={tx.hash}
-            className="bg-zinc-800/50 p-3 rounded-lg border border-zinc-700"
-          >
-            <Link
-              href={`/tx/${tx.hash}`}
-              className="text-sm text-green-400 underline break-all"
-            >
-              {tx.hash}
-            </Link>
-          </div>
-        ))}
+        <h2 className="text-xl font-semibold text-green-300 mb-2">
+          Transactions
+        </h2>
+
+        <div className="overflow-x-auto border border-zinc-800 rounded-xl">
+          <table className="min-w-full text-sm text-left text-white bg-zinc-900/70">
+            <thead className="text-zinc-400 border-b border-zinc-700">
+              <tr>
+                <th className="py-3 px-4">Txn Hash</th>
+                <th className="py-3 px-4">From</th>
+                <th className="py-3 px-4">To</th>
+                <th className="py-3 px-4">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              {block.transactions.slice(0, 20).map((tx: any) => (
+                <tr
+                  key={tx.hash}
+                  className="border-t border-zinc-800 hover:bg-zinc-800/40 transition"
+                >
+                  <td className="py-2 px-4 font-mono text-green-400">
+                    <Link href={`/tx/${tx.hash}`} className="underline">
+                      {tx.hash.slice(0, 10)}...
+                    </Link>
+                  </td>
+                  <td className="py-2 px-4 break-all text-zinc-200">
+                    <Link href={`/address/${tx.from}`} className="underline">
+                      {tx.from.slice(0, 12)}...
+                    </Link>
+                  </td>
+                  <td className="py-2 px-4 break-all text-zinc-200">
+                    {tx.to ? (
+                      <Link href={`/address/${tx.to}`} className="underline">
+                        {tx.to.slice(0, 12)}...
+                      </Link>
+                    ) : (
+                      <span className="text-zinc-500 italic">
+                        Contract Creation
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2 px-4 text-zinc-300">
+                    {(parseFloat(tx.value.toString()) / 1e18).toFixed(5)} ETH
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         {block.transactions.length > 10 && (
           <p className="text-sm text-zinc-400">
             + {block.transactions.length - 10} more transactions not shown...
