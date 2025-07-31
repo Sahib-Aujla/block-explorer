@@ -117,8 +117,25 @@ export default function TxPage() {
           }
         />
         <Detail label="Timestamp" value={timestamp} />
-        <Detail label="From" value={tx.from} />
-        <Detail label="To" value={tx.to || "Contract Creation"} />
+        <div className="flex flex-col sm:flex-row sm:items-center py-1">
+          <span className="w-48 text-zinc-400 font-medium">From:</span>
+          <Link
+            href={`/address/${tx.from}`}
+            className="cursor-pointer underline"
+          >
+            <span className="text-green-200 break-all">{tx.from}</span>
+          </Link>
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center py-1" >
+          <span className="w-48 text-zinc-400 font-medium">To:</span>
+          <Link href={`/address/${tx.to}`} className="cursor-pointer underline">
+            <span className="text-green-200 break-all">
+              {tx.to || "Contract Creation"}
+            </span>
+          </Link>
+        </div>
+
         <Detail label="Value" value={`${valueEth} ETH`} />
         <Detail label="Transaction Fee" value={`${txnFeeEth} ETH`} />
         <Detail

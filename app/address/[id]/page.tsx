@@ -6,6 +6,8 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { AssetTransfersCategory } from "alchemy-sdk";
 import alchemy from "@/lib/alchemy";
+import { ArrowBigLeft } from "lucide-react";
+import SearchBar from "@/components/searchBar";
 
 export default function AddressPage() {
   const { id } = useParams();
@@ -53,6 +55,8 @@ export default function AddressPage() {
   if (error) {
     return (
       <main className="min-h-screen bg-zinc-900 text-white px-6 py-12">
+        <SearchBar />
+
         <h1 className="text-4xl font-bold mb-6 text-red-500">Address Error</h1>
         <p className="text-red-300">{error}</p>
       </main>
@@ -62,6 +66,7 @@ export default function AddressPage() {
   if (loading) {
     return (
       <main className="min-h-screen bg-zinc-900 text-white px-6 py-12">
+        <SearchBar />
         <h1 className="text-4xl font-bold mb-6 text-green-400">
           Loading address...
         </h1>
@@ -72,6 +77,8 @@ export default function AddressPage() {
 
   return (
     <main className="min-h-screen bg-zinc-900 text-white px-6 py-10">
+      <SearchBar />
+
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,9 +87,9 @@ export default function AddressPage() {
       >
         <button
           onClick={() => router.back()}
-          className="text-green-400 hover:text-green-300 text-2xl font-bold"
+          className="text-green-400 cursor-pointer hover:text-green-200 text-2xl font-bold"
         >
-          ←
+          <ArrowBigLeft />
         </button>
         <h1 className="text-2xl sm:text-3xl font-bold text-green-400 font-display break-all">
           Address Overview
@@ -148,13 +155,10 @@ export default function AddressPage() {
                   <td className="py-2 px-4">
                     {tx.metadata?.blockTimestamp?.split("T")[0]}
                   </td>
-                  <Link href={`/address/${tx.from}`} className="underline">
-                    <td className="py-2 px-4 break-all">{tx.from}</td>
-                  </Link>
+                  <td onClick={()=>{router.push(`/address/${tx.from}`)}} className="py-2 px-4 break-all underline cursor-ponter">{tx.from}</td>
 
-                  <Link href={`/address/${tx.to}`} className="underline">
-                    <td className="py-2 px-4 break-all">{tx.to}</td>
-                  </Link>
+                  <td  onClick={()=>{router.push(`/address/${tx.to}`)}} className="py-2 px-4 break-all underline cursor-pointer">{tx.to}</td>
+
                   <td className="py-2 px-4">
                     {tx.value ? (parseFloat(tx.value) / 1e18).toFixed(5) : "0"}{" "}
                     ETH
